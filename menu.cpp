@@ -27,7 +27,7 @@ CMenu::CMenu() {
 		printf("Start!\n");
 	});
 
-	CButton quitButton(quitRect, textures["start"], []() {
+	CButton quitButton(quitRect, textures["quit"], []() {
 		SDL_Event e;
 		e.type = SDL_QUIT;
 
