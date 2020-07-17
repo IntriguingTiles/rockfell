@@ -5,6 +5,7 @@ project ("rockfell")
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 find_package (Git)
 
@@ -39,9 +40,4 @@ if (NOT CMAKE_BUILD_TYPE MATCHES "Debug")
 	set (ROCKFELL_HIDE_CONSOLE WIN32)
 endif ()
 
-find_package (SDL2 REQUIRED)
-find_package (SDL2_image REQUIRED)
-include_directories (${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS})
-
-add_executable (rockfell ${ROCKFELL_HIDE_CONSOLE} "main.cpp" "menu.cpp" "menu.h" "button.cpp" "button.h" "interfaces.h" "globals.h" "sdl_goop.cpp" "sdl_goop.h")
-target_link_libraries (rockfell ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
+add_subdirectory (${PROJECT_SOURCE_DIR}/src)
