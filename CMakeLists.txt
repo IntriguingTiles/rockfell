@@ -32,7 +32,7 @@ if (MSVC)
 	string (REGEX REPLACE "/W[0-4]" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 	add_compile_options (/W4 /WX)
 else ()
-	add_compile_options (-Wall -Werror)
+	add_compile_options (-Wall -Wextra -pedantic -Werror)
 endif ()
 
 if (NOT CMAKE_BUILD_TYPE MATCHES "Debug")
