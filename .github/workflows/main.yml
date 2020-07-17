@@ -1,0 +1,19 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    name: Linux
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install packages
+        run: sudo apt-get update && sudo apt-get -y install libsdl2-dev libsdl2-image-dev
+      - name: Run CMake
+        uses: lukka/run-cmake@v2
