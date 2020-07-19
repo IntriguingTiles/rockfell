@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  linux:
     name: Linux
     runs-on: ubuntu-20.04
     steps:
@@ -17,3 +17,19 @@ jobs:
         run: sudo apt-get update && sudo apt-get -y install libsdl2-dev libsdl2-image-dev
       - name: Run CMake
         uses: lukka/run-cmake@v2
+  windows:
+    name: Windows
+    runs-on: windows-2019
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install packages
+        uses: lukka/run-vcpkg@v3
+        with:
+          vcpkgGitCommitId: 273b5eddaa2d38b7df285efe915a0ce0ba12b7c5
+          vcpkgTriplet: 'x64-windows'
+          vcpkgArguments: 'sdl2 sdl2-image'
+      - name: Run CMake
+        uses: lukka/run-cmake@v2
+        with:
+          useVcpkgToolchainFile: true
