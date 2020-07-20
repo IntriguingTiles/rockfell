@@ -1,7 +1,7 @@
 # Rockfell
-This is a small 2D game with a custom engine utilizing SDL2 for rendering.
+![CI](https://github.com/IntriguingTiles/rockfell/workflows/CI/badge.svg)
 
-It should be cross-platform but has only been tested on Windows so far.
+This is a small cross-platform 2D game with a custom engine utilizing SDL2 for rendering.
 
 # Building
 Requires SDL2 and SDL2_image to be installed.
