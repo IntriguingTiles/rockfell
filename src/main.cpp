@@ -43,6 +43,7 @@ int main(int, char**) {
 	while (running) {
 		while (SDL_PollEvent(&e)) {
 			if (e.type == SDL_QUIT) running = false;
+			g_Input.OnEvent(&e);
 			g_EventListener->OnEvent(&e);
 		}
 

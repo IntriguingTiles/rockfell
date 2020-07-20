@@ -4,6 +4,7 @@
 
 #include "interfaces.h"
 #include "menu.h"
+#include "input.h"
 
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
@@ -16,3 +17,5 @@ inline IEventListener* g_EventListener = nullptr;
 inline std::unordered_map<std::string, SDL_Texture*> textures;
 
 inline CMenu* g_Menu = nullptr;
+
+inline CInput g_Input;
