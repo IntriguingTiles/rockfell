@@ -7,29 +7,132 @@ on:
     branches: [ master ]
 
 jobs:
-  linux:
-    name: Linux
-    runs-on: ubuntu-20.04
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Install packages
+
+      - name: Create artifacts directory
+        run: mkdir artifacts
+
+      - name: Get short commit hash
+        id: repo
+        working-directory: ${{ github.workspace }}
+        run: echo "::set-output name=commit::$(git rev-parse --short HEAD)"
+
+      - name: Create GitHub release
+        id: release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.repo.outputs.commit }}
+          release_name: Alpha ${{ steps.repo.outputs.commit }}
+          draft: true
+          prerelease: true
+      
+      - name: Save upload URL
+        run: echo "${{ steps.release.outputs.upload_url }}" > artifacts/release-upload-url
+
+      - name: Save release ID
+        run: echo "${{ steps.release.outputs.id }}" > artifacts/release-id
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: artifacts
+          path: artifacts
+      
+
+  build-release:
+    name: Build Release
+    needs: ["create-release"]
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-20.04, windows-latest]
+        include:
+          - os: ubuntu-20.04
+            name: linux
+          - os: windows-latest
+            name: windows
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install packages (Linux)
         run: sudo apt-get update && sudo apt-get -y install libsdl2-dev libsdl2-image-dev
-      - name: Run CMake
-        uses: lukka/run-cmake@v2
-  windows:
-    name: Windows
-    runs-on: windows-2019
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Install packages
+        if: matrix.os == 'ubuntu-20.04'
+
+      - name: Install packages (Windows)
         uses: lukka/run-vcpkg@v3
         with:
           vcpkgGitCommitId: 273b5eddaa2d38b7df285efe915a0ce0ba12b7c5
           vcpkgTriplet: 'x64-windows'
           vcpkgArguments: 'sdl2 sdl2-image'
+        if: matrix.os == 'windows-latest'
+
       - name: Run CMake
         uses: lukka/run-cmake@v2
         with:
+          cmakeBuildType: 'Release'
           useVcpkgToolchainFile: true
+
+      - name: Make release archive (Linux)
+        run: |
+          cp "${{ github.workspace }}/../../_temp/rockfell" .
+          zip -r linux.zip rockfell data
+        if: matrix.os == 'ubuntu-20.04'
+
+      - name: Make release archive (Windows)
+        run: |
+          cp "${{ github.workspace }}/../../_temp/*.exe" .
+          cp "${{ github.workspace }}/../../_temp/*.dll" .
+          7z.exe a -tzip windows.zip *.exe *.dll data
+        if: matrix.os == 'windows-latest'
+
+      - name: Get artifacts
+        uses: actions/download-artifact@v1
+        with:
+          name: artifacts
+          path: artifacts
+
+      - name: Get upload URL
+        shell: bash
+        run: |
+          echo "::set-env name=UPLOAD_URL::$(cat artifacts/release-upload-url)"
+
+      - name: Upload release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ env.UPLOAD_URL }}
+          asset_path: ./${{ matrix.name }}.zip
+          asset_name: ${{ matrix.name }}.zip
+          asset_content_type: application/zip
+  publish-release:
+    name: Publish Release
+    needs: [build-release]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get artifacts
+        uses: actions/download-artifact@v1
+        with:
+          name: artifacts
+          path: artifacts
+      
+      - name: Get release ID
+        run: echo "::set-env name=RELEASE_ID::$(cat artifacts/release-id)"
+      
+      - name: Publish release
+        uses: eregon/publish-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ env.RELEASE_ID }}
