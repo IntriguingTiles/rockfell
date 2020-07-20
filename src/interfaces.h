@@ -13,3 +13,9 @@ public:
 	virtual void OnEvent(SDL_Event*) = 0;
 	virtual ~IEventListener() {};
 };
+
+class IUpdateable {
+public:
+	virtual void Update() = 0;
+	virtual ~IUpdateable() {};
+};
