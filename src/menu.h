@@ -13,5 +13,5 @@ class CMenu : public IRenderable, public IEventListener {
 public:
 	CMenu();
 	void Render(SDL_Renderer*) override;
-	void Update(SDL_Event*) override;
+	void OnEvent(SDL_Event*) override;
 };

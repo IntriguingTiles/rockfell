@@ -10,6 +10,6 @@ public:
 
 class IEventListener {
 public:
-	virtual void Update(SDL_Event*) = 0;
+	virtual void OnEvent(SDL_Event*) = 0;
 	virtual ~IEventListener() {};
 };

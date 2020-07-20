@@ -46,8 +46,8 @@ void CMenu::Render(SDL_Renderer* renderer) {
 	}
 }
 
-void CMenu::Update(SDL_Event* e) {
+void CMenu::OnEvent(SDL_Event* e) {
 	for (auto& button : buttons) {
-		button.Update(e);
+		button.OnEvent(e);
 	}
 }

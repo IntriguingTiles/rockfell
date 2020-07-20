@@ -43,7 +43,7 @@ int main(int, char**) {
 	while (running) {
 		while (SDL_PollEvent(&e)) {
 			if (e.type == SDL_QUIT) running = false;
-			g_EventListener->Update(&e);
+			g_EventListener->OnEvent(&e);
 		}
 
 		SDL_RenderClear(g_Renderer);

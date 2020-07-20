@@ -17,7 +17,7 @@ void CButton::Render(SDL_Renderer* renderer) {
 	SDL_SetTextureColorMod(texture, 255, 255, 255);
 }
 
-void CButton::Update(SDL_Event* e) {
+void CButton::OnEvent(SDL_Event* e) {
 	if (e->type == SDL_MOUSEMOTION) {
 		int x, y;
 

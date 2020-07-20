@@ -16,5 +16,5 @@ class CButton : public IRenderable, public IEventListener {
 public:
 	CButton(SDL_Rect rect, SDL_Texture* texture, std::function<void()> callback);
 	void Render(SDL_Renderer* renderer) override;
-	void Update(SDL_Event* e) override;
+	void OnEvent(SDL_Event* e) override;
 };
