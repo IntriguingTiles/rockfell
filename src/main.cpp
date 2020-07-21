@@ -13,7 +13,7 @@ int main(int, char**) {
 	char title[64];
 	snprintf(title, sizeof(title), "Rockfell (%s %s)", ROCKFELL_GIT_BRANCH, ROCKFELL_GIT_HASH);
 
-	if (!sdl.Init(&g_Window, &g_Renderer, title, SCREEN_WIDTH, SCREEN_HEIGHT)) {
+	if (!sdl.Init(&g_Window, &g_Renderer, title, "data/icon.png", SCREEN_WIDTH, SCREEN_HEIGHT)) {
 		char buf[128];
 		snprintf(buf, sizeof(buf), "Failed to initialize SDL: %s", SDL_GetError());
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Rockfell", buf, nullptr);
