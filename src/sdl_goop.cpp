@@ -2,13 +2,38 @@
 #include <SDL.h>
 #include <SDL_image.h>
 
+#ifdef WIN32
+#include <Windows.h>
+#endif
+
 #include "sdl_goop.h"
 
 bool CSDLGoop::Init(SDL_Window** window, SDL_Renderer** renderer, const char* title, const char* iconPath, int w, int h) {
 	if (SDL_Init(SDL_INIT_VIDEO) == -1) return false;
 	if (!IMG_Init(IMG_INIT_PNG)) return false;
 
-	*window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, SDL_WINDOW_SHOWN);
+#ifdef WIN32
+	void* shcoreDLL = SDL_LoadObject("SHCORE.DLL");
+	void* userDLL = SDL_LoadObject("USER32.DLL");
+	BOOL(WINAPI * SetProcessDPIAware)(void) = nullptr;
+	HRESULT(WINAPI * SetProcessDpiAwareness)(int awareness) = nullptr;
+
+	if (shcoreDLL) {
+		SetProcessDpiAwareness = (HRESULT(WINAPI*)(int)) SDL_LoadFunction(shcoreDLL, "SetProcessDpiAwareness");
+	}
+
+	if (userDLL) {
+		SetProcessDPIAware = (BOOL(WINAPI*)(void)) SDL_LoadFunction(userDLL, "SetProcessDPIAware");
+	}
+
+	if (SetProcessDpiAwareness) {
+		SetProcessDpiAwareness(2);
+	} else if (SetProcessDPIAware) {
+		SetProcessDPIAware();
+	}
+#endif
+
+	*window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, SDL_WINDOW_ALLOW_HIGHDPI);
 	if (!*window) return false;
 
 	*renderer = SDL_CreateRenderer(*window, -1, SDL_RENDERER_ACCELERATED);
