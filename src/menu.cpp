@@ -1,3 +1,4 @@
+#include <memory>
 #include <SDL.h>
 
 #include "menu.h"
@@ -23,31 +24,30 @@ CMenu::CMenu() {
 	titleRect.w = 256 * 2;
 	titleRect.h = 64 * 2;
 
-	CButton startButton(startRect, textures["start"], []() {
-		printf("Start!\n");
-	});
+	buttons.push_back(std::make_unique<CButton>(startRect, textures["start"], []() {
+		g_Renderable = g_Rockfell;
+		g_Updateable = g_Rockfell;
+		g_EventListener = nullptr;
+	}));
 
-	CButton quitButton(quitRect, textures["quit"], []() {
+	buttons.push_back(std::make_unique<CButton>(quitRect, textures["quit"], []() {
 		SDL_Event e;
 		e.type = SDL_QUIT;
 
 		SDL_PushEvent(&e);
-	});
-
-	buttons.push_back(startButton);
-	buttons.push_back(quitButton);
+	}));
 }
 
 void CMenu::Render(SDL_Renderer* renderer) {
 	SDL_RenderCopy(renderer, textures["title"], nullptr, &titleRect);
 
 	for (auto& button : buttons) {
-		button.Render(renderer);
+		button->Render(renderer);
 	}
 }
 
 void CMenu::OnEvent(SDL_Event* e) {
 	for (auto& button : buttons) {
-		button.OnEvent(e);
+		button->OnEvent(e);
 	}
 }

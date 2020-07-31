@@ -45,6 +45,8 @@ bool CSDLGoop::Init(SDL_Window** window, SDL_Renderer** renderer, const char* ti
 
 	SDL_SetWindowIcon(*window, icon);
 
+	SDL_FreeSurface(icon);
+
 	return true;
 }
 

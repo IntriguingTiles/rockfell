@@ -1,11 +1,14 @@
 ﻿#include <stdio.h>
 #include <iostream>
 #include <filesystem>
+#include <chrono>
 #include <SDL.h>
 #include <SDL_image.h>
 
 #include "sdl_goop.h"
 #include "globals.h"
+#include "menu.h"
+#include "rockfell.h"
 
 int main(int, char**) {
 	CSDLGoop sdl;
@@ -39,6 +42,7 @@ int main(int, char**) {
 	}
 
 	g_Menu = new CMenu;
+	g_Rockfell = new CRockfell;
 	g_EventListener = g_Menu;
 	g_Renderable = g_Menu;
 
@@ -49,8 +53,10 @@ int main(int, char**) {
 		while (SDL_PollEvent(&e)) {
 			if (e.type == SDL_QUIT) running = false;
 			g_Input.OnEvent(&e);
-			g_EventListener->OnEvent(&e);
+			if (g_EventListener) g_EventListener->OnEvent(&e);
 		}
+
+		if (g_Updateable) g_Updateable->Update();
 
 		SDL_RenderClear(g_Renderer);
 		g_Renderable->Render(g_Renderer);
@@ -62,6 +68,7 @@ int main(int, char**) {
 	}
 
 	delete g_Menu;
+	delete g_Rockfell;
 
 	sdl.Shutdown(g_Window, g_Renderer);
 	return 0;
