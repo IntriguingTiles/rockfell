@@ -16,6 +16,7 @@ public:
 
 class IUpdateable {
 public:
+	Uint32 nextUpdate = 0;
 	virtual void Update() = 0;
 	virtual ~IUpdateable() {};
 };

@@ -56,7 +56,7 @@ int main(int, char**) {
 			if (g_EventListener) g_EventListener->OnEvent(&e);
 		}
 
-		if (g_Updateable) g_Updateable->Update();
+		if (g_Updateable && g_Updateable->nextUpdate <= SDL_GetTicks()) g_Updateable->Update();
 
 		SDL_RenderClear(g_Renderer);
 		g_Renderable->Render(g_Renderer);

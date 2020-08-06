@@ -17,6 +17,6 @@ void CRockfell::Render(SDL_Renderer* renderer) {
 
 void CRockfell::Update() {
 	for (auto& entity : entities) {
-		entity->Update();
+		if (entity->nextUpdate <= SDL_GetTicks()) entity->Update();
 	}
 }
