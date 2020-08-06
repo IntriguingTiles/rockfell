@@ -9,8 +9,13 @@
 #include "sdl_goop.h"
 
 bool CSDLGoop::Init(SDL_Window** window, SDL_Renderer** renderer, const char* title, const char* iconPath, int w, int h) {
-	if (SDL_Init(SDL_INIT_VIDEO) == -1) return false;
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) == -1) return false;
 	if (!IMG_Init(IMG_INIT_PNG)) return false;
+
+	for (int i = 0; i < SDL_NumJoysticks(); i++) {
+		auto controller = SDL_GameControllerOpen(i);
+		controllers.push_back(controller);
+	}
 
 #ifdef WIN32
 	void* shcoreDLL = SDL_LoadObject("SHCORE.DLL");
@@ -44,7 +49,6 @@ bool CSDLGoop::Init(SDL_Window** window, SDL_Renderer** renderer, const char* ti
 	auto* icon = IMG_Load(iconPath);
 
 	SDL_SetWindowIcon(*window, icon);
-
 	SDL_FreeSurface(icon);
 
 	return true;
@@ -69,6 +73,10 @@ SDL_Texture* CSDLGoop::LoadTexture(const char* path, SDL_Renderer* renderer) {
 }
 
 void CSDLGoop::Shutdown(SDL_Window* window, SDL_Renderer* renderer) {
+	for (auto& controller : controllers) {
+		SDL_GameControllerClose(controller);
+	}
+
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
