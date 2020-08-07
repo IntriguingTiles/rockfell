@@ -39,7 +39,15 @@ void CInput::OnEvent(SDL_Event* e) {
 			keys.left = e->caxis.value < -DEADZONE;
 			keys.right = e->caxis.value > DEADZONE;
 		}
-
+		break;
+	case SDL_JOYAXISMOTION:
+		if (e->jaxis.axis == 0) {
+			keys.left = e->jaxis.value < -DEADZONE;
+			keys.right = e->jaxis.value > DEADZONE;
+		}
+		break;
+	case SDL_JOYBUTTONDOWN:
+		// do onthing
 		break;
 	case SDL_MOUSEBUTTONDOWN:
 	case SDL_MOUSEBUTTONUP:

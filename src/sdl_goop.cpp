@@ -13,7 +13,11 @@ bool CSDLGoop::Init(SDL_Window** window, SDL_Renderer** renderer, const char* ti
 	if (!IMG_Init(IMG_INIT_PNG)) return false;
 
 	for (int i = 0; i < SDL_NumJoysticks(); i++) {
+#ifdef __WIIU__
+		auto controller = SDL_JoystickOpen(i);
+#else
 		auto controller = SDL_GameControllerOpen(i);
+#endif
 		controllers.push_back(controller);
 	}
 
@@ -74,7 +78,11 @@ SDL_Texture* CSDLGoop::LoadTexture(const char* path, SDL_Renderer* renderer) {
 
 void CSDLGoop::Shutdown(SDL_Window* window, SDL_Renderer* renderer) {
 	for (auto& controller : controllers) {
+#ifdef __WIIU__
+		SDL_JoystickClose(controller);
+#else
 		SDL_GameControllerClose(controller);
+#endif
 	}
 
 	SDL_DestroyRenderer(renderer);

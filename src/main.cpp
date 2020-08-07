@@ -5,10 +5,24 @@
 #include <SDL.h>
 #include <SDL_image.h>
 
+#ifdef __WIIU__
+#include <whb/proc.h>
+#endif
+
 #include "sdl_goop.h"
 #include "globals.h"
 #include "menu.h"
 #include "rockfell.h"
+
+bool isRunning = false;
+
+bool running() {
+#ifdef __WIIU__
+	return WHBProcIsRunning();
+#else
+	return isRunning;
+#endif
+}
 
 int main(int, char**) {
 	CSDLGoop sdl;
@@ -41,27 +55,44 @@ int main(int, char**) {
 		}
 	}
 
+#ifdef __WIIU__
+	WHBProcInit();
+#endif
+
 	g_Menu = new CMenu;
 	g_Rockfell = new CRockfell;
 	g_EventListener = g_Menu;
 	g_Renderable = g_Menu;
 
-	bool running = true;
+	isRunning = true;
 	SDL_Event e;
 
-	while (running) {
+	auto thread = SDL_CreateThread([](void*) {
+		// this is really dumb and we will likely run into problems in the future but it works for now
+		while (running()) {
+			if (g_Updateable) g_Updateable->Update();
+		}
+
+		return 0;
+	}, "update", nullptr);
+
+	while (running()) {
 		while (SDL_PollEvent(&e)) {
-			if (e.type == SDL_QUIT) running = false;
+#ifdef __WIIU__
+			if (e.type == SDL_QUIT) WHBProcStopRunning();
+#else
+			if (e.type == SDL_QUIT) isRunning = false;
+#endif
 			g_Input.OnEvent(&e);
 			if (g_EventListener) g_EventListener->OnEvent(&e);
 		}
-
-		if (g_Updateable && g_Updateable->nextUpdate <= SDL_GetTicks()) g_Updateable->Update();
 
 		SDL_RenderClear(g_Renderer);
 		g_Renderable->Render(g_Renderer);
 		SDL_RenderPresent(g_Renderer);
 	}
+
+	SDL_WaitThread(thread, nullptr);
 
 	for (const auto& texture : textures) {
 		SDL_DestroyTexture(texture.second);
@@ -69,6 +100,10 @@ int main(int, char**) {
 
 	delete g_Menu;
 	delete g_Rockfell;
+
+#ifdef __WIIU__
+	WHBProcShutdown();
+#endif
 
 	sdl.Shutdown(g_Window, g_Renderer);
 	return 0;
