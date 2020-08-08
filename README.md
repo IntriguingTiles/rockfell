@@ -14,3 +14,15 @@ cd build
 cmake ..
 make
 ```
+
+# Building for Wii U
+Requires devkitPPC. wiiu-sdl2, wiiu-sdl2_image, and wiiu-libromfs must be installed from the [wiiu-fling](https://gitlab.com/QuarkTheAwesome/wiiu-fling) repository as the versions available in the default dkp-libs repository are broken.
+
+```
+git clone https://github.com/IntriguingTiles/rockfell.git
+cd rockfell
+mkdir build
+cd build
+cmake -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/wut/share/wut.toolchain.cmake ..
+make
+```

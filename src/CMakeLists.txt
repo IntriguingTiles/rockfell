@@ -1,5 +1,6 @@
 if (DEFINED WIIU)
 	include ("${DEVKITPRO}/wut/share/wut.cmake" REQUIRED)
+	include ("${DEVKITPRO}/portlibs/wiiu/share/romfs-wiiu.cmake" REQUIRED)
 
 	find_package (PkgConfig REQUIRED)
 	pkg_search_module (TURBOJPEG REQUIRED libturbojpeg)
@@ -22,5 +23,6 @@ add_executable (rockfell ${ROCKFELL_HIDE_CONSOLE} "main.cpp" "menu.cpp" "menu.h"
 target_link_libraries (rockfell ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES} ${TURBOJPEG_LIBRARIES} ${PNG_LIBRARIES})
 
 if (DEFINED WIIU)
+	romfs_add (rockfell "../data")
 	wut_create_rpx (rockfell)
 endif ()

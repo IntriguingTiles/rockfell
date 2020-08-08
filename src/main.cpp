@@ -7,6 +7,10 @@
 
 #ifdef __WIIU__
 #include <whb/proc.h>
+#include <romfs-wiiu.h>
+#define DATA_DIR "romfs:/"
+#else
+#define DATA_DIR "data/"
 #endif
 
 #include "sdl_goop.h"
@@ -27,15 +31,20 @@ bool running() {
 int main(int, char**) {
 	CSDLGoop sdl;
 
+#ifdef __WIIU__
+	WHBProcInit();
+	romfsInit();
+#endif
+
 	char title[64];
 	snprintf(title, sizeof(title), "Rockfell (%s %s)", ROCKFELL_GIT_BRANCH, ROCKFELL_GIT_HASH);
 
-	if (!std::filesystem::exists("data")) {
+	if (!std::filesystem::exists(DATA_DIR)) {
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Rockfell", "Data directory not found.", nullptr);
 		return -1;
 	}
 
-	if (!sdl.Init(&g_Window, &g_Renderer, title, "data/icon.png", SCREEN_WIDTH, SCREEN_HEIGHT)) {
+	if (!sdl.Init(&g_Window, &g_Renderer, title, DATA_DIR "icon.png", SCREEN_WIDTH, SCREEN_HEIGHT)) {
 		char buf[128];
 		snprintf(buf, sizeof(buf), "Failed to initialize SDL: %s", SDL_GetError());
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Rockfell", buf, nullptr);
@@ -43,7 +52,7 @@ int main(int, char**) {
 		return -1;
 	}
 
-	for (const auto& file : std::filesystem::directory_iterator("data/textures")) {
+	for (const auto& file : std::filesystem::directory_iterator(DATA_DIR "textures")) {
 		textures[file.path().stem().string()] = sdl.LoadTexture(file.path().string().c_str(), g_Renderer);
 
 		if (!textures[file.path().stem().string()]) {
@@ -55,9 +64,6 @@ int main(int, char**) {
 		}
 	}
 
-#ifdef __WIIU__
-	WHBProcInit();
-#endif
 
 	g_Menu = new CMenu;
 	g_Rockfell = new CRockfell;
@@ -102,6 +108,7 @@ int main(int, char**) {
 	delete g_Rockfell;
 
 #ifdef __WIIU__
+	romfsExit();
 	WHBProcShutdown();
 #endif
 
