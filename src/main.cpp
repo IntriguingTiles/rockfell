@@ -28,6 +28,22 @@ bool running() {
 #endif
 }
 
+int renderThread(void*) {
+	// this is really dumb and we will likely run into problems in the future but it works for now
+	while (running()) {
+		// on wii u, we can only render using the main core :/
+#ifdef __WIIU__
+		if (g_Updateable) g_Updateable->Update();
+#else
+		SDL_RenderClear(g_Renderer);
+		g_Renderable->Render(g_Renderer);
+		SDL_RenderPresent(g_Renderer);
+#endif
+	}
+
+	return 0;
+}
+
 int main(int, char**) {
 	CSDLGoop sdl;
 
@@ -73,21 +89,7 @@ int main(int, char**) {
 	isRunning = true;
 	SDL_Event e;
 
-	auto thread = SDL_CreateThread([](void*) {
-		// this is really dumb and we will likely run into problems in the future but it works for now
-		while (running()) {
-			// on wii u, we can only render using the main core :/
-#ifdef __WIIU__
-			if (g_Updateable) g_Updateable->Update();
-#else
-			SDL_RenderClear(g_Renderer);
-			g_Renderable->Render(g_Renderer);
-			SDL_RenderPresent(g_Renderer);
-#endif
-		}
-
-		return 0;
-	}, "update", nullptr);
+	auto thread = SDL_CreateThread(renderThread, "render", nullptr);
 
 	while (running()) {
 		while (SDL_PollEvent(&e)) {
