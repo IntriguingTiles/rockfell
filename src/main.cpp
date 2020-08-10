@@ -76,7 +76,9 @@ int main(int, char**) {
 	auto thread = SDL_CreateThread([](void*) {
 		// this is really dumb and we will likely run into problems in the future but it works for now
 		while (running()) {
-			if (g_Updateable) g_Updateable->Update();
+			SDL_RenderClear(g_Renderer);
+			g_Renderable->Render(g_Renderer);
+			SDL_RenderPresent(g_Renderer);
 		}
 
 		return 0;
@@ -93,9 +95,7 @@ int main(int, char**) {
 			if (g_EventListener) g_EventListener->OnEvent(&e);
 		}
 
-		SDL_RenderClear(g_Renderer);
-		g_Renderable->Render(g_Renderer);
-		SDL_RenderPresent(g_Renderer);
+		if (g_Updateable) g_Updateable->Update();
 	}
 
 	SDL_WaitThread(thread, nullptr);
