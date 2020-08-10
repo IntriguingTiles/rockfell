@@ -76,9 +76,14 @@ int main(int, char**) {
 	auto thread = SDL_CreateThread([](void*) {
 		// this is really dumb and we will likely run into problems in the future but it works for now
 		while (running()) {
+			// on wii u, we can only render using the main core :/
+#ifdef __WIIU__
+			if (g_Updateable) g_Updateable->Update();
+#else
 			SDL_RenderClear(g_Renderer);
 			g_Renderable->Render(g_Renderer);
 			SDL_RenderPresent(g_Renderer);
+#endif
 		}
 
 		return 0;
@@ -95,7 +100,13 @@ int main(int, char**) {
 			if (g_EventListener) g_EventListener->OnEvent(&e);
 		}
 
+#ifdef __WIIU__
+		SDL_RenderClear(g_Renderer);
+		g_Renderable->Render(g_Renderer);
+		SDL_RenderPresent(g_Renderer);
+#else
 		if (g_Updateable) g_Updateable->Update();
+#endif
 	}
 
 	SDL_WaitThread(thread, nullptr);
