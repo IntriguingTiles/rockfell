@@ -18,32 +18,6 @@
 #include "menu.h"
 #include "rockfell.h"
 
-bool isRunning = false;
-
-bool running() {
-#ifdef __WIIU__
-	return WHBProcIsRunning();
-#else
-	return isRunning;
-#endif
-}
-
-int renderThread(void*) {
-	// this is really dumb and we will likely run into problems in the future but it works for now
-	while (running()) {
-		// on wii u, we can only render using the main core :/
-#ifdef __WIIU__
-		if (g_Updateable) g_Updateable->Update();
-#else
-		SDL_RenderClear(g_Renderer);
-		g_Renderable->Render(g_Renderer);
-		SDL_RenderPresent(g_Renderer);
-#endif
-	}
-
-	return 0;
-}
-
 int main(int, char**) {
 	CSDLGoop sdl;
 
@@ -80,38 +54,47 @@ int main(int, char**) {
 		}
 	}
 
-
 	g_Menu = new CMenu;
 	g_Rockfell = new CRockfell;
 	g_EventListener = g_Menu;
 	g_Renderable = g_Menu;
 
-	isRunning = true;
+	bool running = true;
 	SDL_Event e;
 
-	auto thread = SDL_CreateThread(renderThread, "render", nullptr);
-
-	while (running()) {
-		while (SDL_PollEvent(&e)) {
 #ifdef __WIIU__
+	auto thread = SDL_CreateThread([](void*) {
+		// on the wii u, v-sync is enforced which means rendering takes longer to complete than we're expecting, this works for now.
+		while (WHBProcIsRunning()) {
+			if (g_Updateable) g_Updateable->Update();
+		}
+
+		return 0;
+	}, "update", nullptr);
+
+	while (WHBProcIsRunning()) {
+		while (SDL_PollEvent(&e)) {
 			if (e.type == SDL_QUIT) WHBProcStopRunning();
 #else
-			if (e.type == SDL_QUIT) isRunning = false;
+	while (running) {
+		while (SDL_PollEvent(&e)) {
+			if (e.type == SDL_QUIT) running = false;
 #endif
 			g_Input.OnEvent(&e);
 			if (g_EventListener) g_EventListener->OnEvent(&e);
 		}
 
-#ifdef __WIIU__
 		SDL_RenderClear(g_Renderer);
 		g_Renderable->Render(g_Renderer);
 		SDL_RenderPresent(g_Renderer);
-#else
+#ifndef __WIIU__
 		if (g_Updateable) g_Updateable->Update();
 #endif
 	}
 
+#ifdef __WIIU__
 	SDL_WaitThread(thread, nullptr);
+#endif
 
 	for (const auto& texture : textures) {
 		SDL_DestroyTexture(texture.second);
