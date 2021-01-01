@@ -24,13 +24,13 @@ CMenu::CMenu() {
 	titleRect.w = 256 * 2;
 	titleRect.h = 64 * 2;
 
-	buttons.push_back(std::make_unique<CButton>(startRect, textures["start"], []() {
-		g_Renderable = g_Rockfell;
-		g_Updateable = g_Rockfell;
-		g_EventListener = nullptr;
+	buttons.push_back(std::make_unique<CButton>(startRect, g_Globals.textures["start"], []() {
+		g_Globals.renderable = g_Globals.rockfell;
+		g_Globals.updateable = g_Globals.rockfell;
+		g_Globals.eventListener = nullptr;
 	}));
 
-	buttons.push_back(std::make_unique<CButton>(quitRect, textures["quit"], []() {
+	buttons.push_back(std::make_unique<CButton>(quitRect, g_Globals.textures["quit"], []() {
 		SDL_Event e;
 		e.type = SDL_QUIT;
 
@@ -39,7 +39,7 @@ CMenu::CMenu() {
 }
 
 void CMenu::Render(SDL_Renderer* renderer) {
-	SDL_RenderCopy(renderer, textures["title"], nullptr, &titleRect);
+	SDL_RenderCopy(renderer, g_Globals.textures["title"], nullptr, &titleRect);
 
 	for (auto& button : buttons) {
 		button->Render(renderer);

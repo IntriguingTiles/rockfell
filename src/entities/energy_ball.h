@@ -2,9 +2,7 @@
 
 #include "base_entity.h"
 
-class CPlayer : public CBaseEntity {
-	bool jump = false;
-	Uint32 nextAttack = 0;
+class CEnergyBall : public CBaseEntity {
 public:
 	using CBaseEntity::CBaseEntity;
 	void Update() override;

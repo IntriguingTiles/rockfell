@@ -2,12 +2,12 @@
 
 #include "base_entity.h"
 
-CBaseEntity::CBaseEntity(SDL_Texture* texture) {
+CBaseEntity::CBaseEntity(SDL_Texture* texture, int x, int y) {
 	int w, h;
 	SDL_QueryTexture(texture, nullptr, nullptr, &w, &h);
 
-	rect.x = 0;
-	rect.y = 0;
+	rect.x = x;
+	rect.y = y;
 	rect.w = w;
 	rect.h = h;
 

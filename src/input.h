@@ -10,6 +10,6 @@ struct Keys {
 
 class CInput : public IEventListener {
 public:
-	Keys keys;
+	Keys keys = {};
 	void OnEvent(SDL_Event* e) override;
 };

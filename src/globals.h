@@ -7,18 +7,19 @@
 #include "rockfell.h"
 #include "input.h"
 
-#define SCREEN_WIDTH 800
-#define SCREEN_HEIGHT 600
+constexpr int SCREEN_WIDTH = 800;
+constexpr int SCREEN_HEIGHT = 600;
 
-inline SDL_Window* g_Window = nullptr;
-inline SDL_Renderer* g_Renderer = nullptr;
-inline IRenderable* g_Renderable = nullptr;
-inline IEventListener* g_EventListener = nullptr;
-inline IUpdateable* g_Updateable = nullptr;
+struct Globals {
+	SDL_Window* window = nullptr;
+	SDL_Renderer* renderer = nullptr;
+	IRenderable* renderable = nullptr;
+	IEventListener* eventListener = nullptr;
+	IUpdateable* updateable = nullptr;
+	std::unordered_map<std::string, SDL_Texture*> textures;
+	CMenu* menu = nullptr;
+	CRockfell* rockfell = nullptr;
+	CInput input;
+};
 
-inline std::unordered_map<std::string, SDL_Texture*> textures;
-
-inline CMenu* g_Menu = nullptr;
-inline CRockfell* g_Rockfell = nullptr;
-
-inline CInput g_Input;
+inline Globals g_Globals;

@@ -9,6 +9,8 @@
 class CRockfell : public IRenderable, public IUpdateable {
 	std::vector<std::unique_ptr<CBaseEntity>> entities;
 public:
+	std::vector<std::unique_ptr<CBaseEntity>> pending;
+
 	CRockfell();
 	void Render(SDL_Renderer*) override;
 	void Update() override;
