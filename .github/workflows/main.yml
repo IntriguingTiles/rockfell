@@ -104,6 +104,8 @@ jobs:
 
       - name: Get upload URL
         shell: bash
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
         run: |
           echo "::set-env name=UPLOAD_URL::$(cat artifacts/release-upload-url)"
 
@@ -128,6 +130,8 @@ jobs:
           path: artifacts
       
       - name: Get release ID
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
         run: echo "::set-env name=RELEASE_ID::$(cat artifacts/release-id)"
       
       - name: Publish release
