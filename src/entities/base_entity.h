@@ -5,6 +5,7 @@
 #include "interfaces.h"
 
 class CBaseEntity : public IRenderable, public IUpdateable {
+protected:
 	SDL_Rect rect;
 	SDL_Texture* texture = nullptr;
 public:
